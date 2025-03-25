@@ -1,0 +1,15 @@
+[project]
+name = "pandas"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "", email = ""},
+]
+dependencies = ["pandas>=2.2.3", "sqlalchemy>=2.0.38", "psycopg2-binary>=2.9.10", "python-dotenv>=1.0.1", "matplotlib>=3.10.1", "sqlmodel>=0.0.24", "openpyxl>=3.1.5"]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
