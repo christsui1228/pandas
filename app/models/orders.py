@@ -18,7 +18,7 @@ class Order(SQLModel, table=True):
     picture_price: float | None = Field(default=None)  # 印制报价
     picture_cost: float | None = Field(default=None)  # 高清图尺寸成本
     color_cost: float | None = Field(default=None)  # 高清图颜色成本
-    wokr_cost: float | None = Field(default=None)  # 高清图工费成本
+    work_cost: float | None = Field(default=None)  # 高清图工费成本
     
     # 衣服相关信息
     cloth_price: float | None = Field(default=None)  # 衣服售价总额

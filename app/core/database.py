@@ -32,8 +32,10 @@ def setup_database():
     inspector = inspect(engine)
     
     try:
-        # 仅导入Order模型
+        # 导入所有需要的模型
         from app.models import Order
+        from app.models.sample_orders import SampleOrder
+        from app.models.bulk_orders import BulkOrder
         
         # 创建表
         print("创建数据库表...")
