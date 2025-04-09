@@ -16,7 +16,17 @@ def get_engine():
 
     # 添加连接参数解决SSL问题
     database_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?sslmode=disable"
-    return create_engine(database_url, echo=False, pool_pre_ping=True, pool_recycle=3600)
+    
+    # 优化连接池参数配置，基于阿里云RDS实例规格(400最大连接)
+    return create_engine(
+        database_url, 
+        echo=False, 
+        pool_pre_ping=True,       # 自动检测已经断开的连接
+        pool_recycle=1800,       # 30分钟重新连接，防止连接过期
+        pool_size=30,            # 连接池基础大小，大约为最大连接数的10%
+        max_overflow=50,         # 允许创建的最大额外连接数
+        pool_timeout=30          # 等待连接的超时时间
+    )
 
 def get_session():
     """获取数据库会话"""

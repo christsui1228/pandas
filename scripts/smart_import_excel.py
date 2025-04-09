@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Excel数据智能导入PostgreSQL工具')
     parser.add_argument('--dir', type=str, help='Excel文件所在目录')
     parser.add_argument('--file', type=str, help='单个Excel文件路径')
-    parser.add_argument('--batch-size', type=int, default=500, help='每批处理的记录数量，默认500')
+    parser.add_argument('--batch-size', type=int, default=1000, help='每批处理的记录数量，默认500')
     args = parser.parse_args()
     
     # 加载环境变量

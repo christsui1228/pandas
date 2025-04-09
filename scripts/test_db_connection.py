@@ -21,8 +21,23 @@ def test_connection():
     print("正在测试数据库连接...")
     
     try:
+        # 获取项目根目录路径
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # 明确指定.env文件路径
+        dotenv_path = os.path.join(project_root, '.env')
+        print(f"加载.env文件: {dotenv_path}")
+        
         # 加载环境变量
-        load_dotenv()
+        load_dotenv(dotenv_path, override=True)
+        
+        # 显示数据库连接信息（不显示密码）
+        db_user = os.getenv("DB_USER")
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_name = os.getenv("DB_NAME")
+        
+        print(f"数据库连接信息: {db_user}@{db_host}:{db_port}/{db_name}")
         
         # 获取数据库连接
         engine = get_engine()

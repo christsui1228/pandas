@@ -38,7 +38,7 @@ class ImportService:
             "印制报价": "picture_price",
             "高清图尺寸成本": "picture_cost",
             "高清图颜色成本": "color_cost",
-            "高清图工费成本": "wokr_cost",
+            "高清图工费成本": "work_cost",
             "衣服售价总额":"cloth_price", 
             "衣服总数": "quantity",
             "衣服成本": "cloth_cost",
@@ -86,11 +86,36 @@ class ImportService:
         # 2. 处理数字字段
         numeric_columns = [
             "amount", "picture_amount", "picture_price", "picture_cost", "color_cost", 
-            "wokr_cost", "cloth_price", "quantity", "cloth_cost", "cloth_pack_cost", 
+            "work_cost", "cloth_price", "quantity", "cloth_cost", "cloth_pack_cost", 
             "color_amount"
         ]
         
-        for col in numeric_columns:
+        # 先处理需要特殊处理的列
+        
+        # 1. 处理cloth_pack_cost列（如果是字符串类型，直接设置为0）
+        if "cloth_pack_cost" in df.columns:
+            if df["cloth_pack_cost"].dtype == 'object':
+                print(f"- 警告: cloth_pack_cost列中存在非数值数据，设置为0")
+                df["cloth_pack_cost"] = 0.0
+        
+        # 2. 处理color_amount列（转换为整数）
+        if "color_amount" in df.columns:
+            # 先转换为浮点数，再转换为整数
+            df["color_amount"] = pd.to_numeric(df["color_amount"], errors='coerce')
+            df["color_amount"] = df["color_amount"].fillna(0).astype(int)
+            print("- 将color_amount列转换为整数")
+        
+        # 3. 处理picture_amount和quantity列（这些也应该是整数）
+        for int_col in ["picture_amount", "quantity"]:
+            if int_col in df.columns:
+                df[int_col] = pd.to_numeric(df[int_col], errors='coerce')
+                df[int_col] = df[int_col].fillna(0).astype(int)
+        
+        # 处理其他数字字段（浮点数）
+        float_cols = ["amount", "picture_price", "picture_cost", "color_cost", 
+                     "work_cost", "cloth_price", "cloth_cost"]
+        
+        for col in float_cols:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
                 df[col] = df[col].fillna(0)
@@ -293,14 +318,21 @@ class ImportService:
                         if missing_cols:
                             print(f"- 添加缺失的列: {missing_cols}")
                             for col in missing_cols:
-                                df[col] = None
+                                # 根据列名判断类型并设置合适的默认值
+                                if col in ['cloth_pack_cost', 'work_cost', 'picture_cost', 'color_cost', 'cloth_cost', 'picture_price', 'amount', 'cloth_price']:
+                                    df[col] = 0.0  # 金额类默认为0
+                                elif col in ['picture_amount', 'quantity', 'color_amount']:
+                                    df[col] = 0    # 数量类默认为0
+                                else:
+                                    df[col] = None  # 其他类型默认为None
+                            print("- 为缺失列设置了适当的默认值")
                             df.to_csv(temp_csv.name, index=False, na_rep='\\N')
                         
                         # 准备COPY命令的列列表，排除id列
                         cols = [c for c in colnames if c != 'id']
                         cols_str = ', '.join(cols)
                         
-                        # 开始COPY导入
+                        # 开始批量导入
                         print("- 开始批量导入...")
                         with open(temp_csv.name, 'r') as f:
                             # 跳过CSV头

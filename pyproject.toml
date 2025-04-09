@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "", email = ""},
 ]
-dependencies = ["pandas>=2.2.3", "sqlalchemy>=2.0.38", "psycopg2-binary>=2.9.10", "python-dotenv>=1.0.1", "matplotlib>=3.10.1", "sqlmodel>=0.0.24", "openpyxl>=3.1.5"]
+dependencies = ["pandas>=2.2.3", "sqlalchemy>=2.0.38", "psycopg2-binary>=2.9.10", "python-dotenv>=1.0.1", "matplotlib>=3.10.1", "sqlmodel>=0.0.24", "openpyxl>=3.1.5", "fastapi>=0.115.12", "uvicorn>=0.34.0", "python-multipart>=0.0.20"]
 requires-python = "==3.12.*"
 readme = "README.md"
 license = {text = "MIT"}
