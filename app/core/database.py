@@ -46,6 +46,7 @@ def setup_database():
         from app.models import Order
         from app.models.sample_orders import SampleOrder
         from app.models.bulk_orders import BulkOrder
+        from app.models.auth import User, Role, Permission, RolePermission, RoleHierarchy
         
         # 创建表
         print("创建数据库表...")
