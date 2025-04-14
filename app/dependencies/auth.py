@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from app.core.database import get_session
 from app.core import security # 从我们刚创建的文件导入
-from app.models.auth import User # 从模型文件导入
+from app.auth.models import User, Role, Permission # 从模型文件导入
 
 # OAuth2 方案，"/api/v1/login/token" 是我们之后会创建的登录端点的路径
 # tokenUrl 指向获取 token 的 API 路径

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 from typing import List
 
-from app.models.customers import SampleCustomer, BulkCustomer
+from .models import SampleCustomer, BulkCustomer
 from app.core.database import get_session
 
 router = APIRouter()

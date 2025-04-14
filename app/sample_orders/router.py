@@ -1,56 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlmodel import Session, select, SQLModel
+from sqlmodel import Session, select
 from typing import List, Optional
 from datetime import datetime
 
-from app.models.sample_orders import SampleOrder
+from .models import SampleOrder
+from .schemas import SampleOrderResponse, SampleOrderCreate, SampleOrderUpdate
 from app.core.database import get_session
 
 router = APIRouter()
-
-# --- Pydantic Models for Sample Orders (moved from main.py) ---
-class SampleOrderResponse(SQLModel):
-    id: Optional[int] = None
-    order_id: str
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
-    created_at: datetime
-    updated_at: datetime
-    
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True
-
-class SampleOrderCreate(SQLModel):
-    order_id: str
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
-    
-    class Config:
-        arbitrary_types_allowed = True
-
-class SampleOrderUpdate(SQLModel):
-    order_id: Optional[str] = None
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
-    
-    class Config:
-        arbitrary_types_allowed = True
 
 # --- Sample Order API Routes (moved from main.py) ---
 @router.get("/", response_model=List[SampleOrderResponse])

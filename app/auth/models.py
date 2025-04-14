@@ -1,10 +1,7 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
-
-if TYPE_CHECKING:
-    from .auth import User, Role
 
 
 # --- Link Tables ---

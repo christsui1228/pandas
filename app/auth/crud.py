@@ -8,7 +8,7 @@ from datetime import datetime, timezone # Import datetime for timestamp
 
 # Import models and security utilities correctly
 # Adjust paths if your models/security are elsewhere
-from app.models.auth import User, UserCreate, UserUpdate
+from .models import User, UserCreate, UserUpdate
 
 
 def get_user_by_email(session: Session, *, email: EmailStr) -> Optional[User]:

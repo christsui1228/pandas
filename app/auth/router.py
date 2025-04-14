@@ -9,8 +9,8 @@ from sqlmodel import Session, select, SQLModel
 from app.core.database import get_session
 from app.core import security
 from app.dependencies.auth import get_current_active_user, require_permission
-from app.models.auth import User, Role, UserCreate, UserPublic, UserUpdate, UserPasswordUpdate
-from app.crud.auth import get_user_by_email, create_user as crud_create_user, update_user as crud_update_user, delete_user_by_id as crud_delete_user_by_id
+from .models import User, Role, UserCreate, UserPublic, UserUpdate, UserPasswordUpdate
+from .crud import get_user_by_email, create_user as crud_create_user, update_user as crud_update_user, delete_user_by_id as crud_delete_user_by_id
 
 # Ensure Pydantic models are correctly defined or imported
 class UserListResponse(UserPublic):
