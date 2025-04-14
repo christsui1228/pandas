@@ -102,3 +102,8 @@ class UserUpdate(SQLModel):
     username: Optional[str] = None
     email: Optional[str] = None
     is_active: Optional[bool] = None
+
+# Model for updating user password (used by user themselves)
+class UserPasswordUpdate(SQLModel):
+    current_password: str
+    new_password: str

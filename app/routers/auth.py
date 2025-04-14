@@ -1,5 +1,5 @@
 # app/routers/auth.py
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -9,7 +9,7 @@ from sqlmodel import Session, select, SQLModel
 from app.core.database import get_session
 from app.core import security
 from app.dependencies.auth import get_current_active_user, require_permission
-from app.models.auth import User, Role, UserCreate, UserPublic, UserUpdate
+from app.models.auth import User, Role, UserCreate, UserPublic, UserUpdate, UserPasswordUpdate
 from app.crud.auth import get_user_by_email, create_user as crud_create_user, update_user as crud_update_user, delete_user_by_id as crud_delete_user_by_id
 
 # Ensure Pydantic models are correctly defined or imported
@@ -211,3 +211,37 @@ def delete_user(
     if not deleted:
         raise HTTPException(status_code=404, detail="未找到用户")
     # No content returned on successful deletion
+
+# --- 新增：用户修改自己的密码 --- 
+@router.patch(
+    "/users/me/password", 
+    status_code=status.HTTP_204_NO_CONTENT, 
+    dependencies=[Depends(require_permission("user.change_password"))], 
+    tags=["Users"]
+)
+def update_password_me(
+    *, 
+    session: Session = Depends(get_session),
+    password_update: UserPasswordUpdate, 
+    current_user: User = Depends(get_current_active_user) 
+):
+    """
+    Update own password.
+    """
+    # 验证当前密码是否正确
+    if not security.verify_password(password_update.current_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="当前密码不正确"
+        )
+    
+    # 验证通过，哈希新密码并更新用户记录
+    hashed_password = security.get_password_hash(password_update.new_password)
+    current_user.hashed_password = hashed_password
+    current_user.updated_at = datetime.now(timezone.utc)
+    
+    session.add(current_user)
+    session.commit()
+    # No need to refresh if we don't return the user object
+
+    # Return nothing, FastAPI will send 204 No Content
