@@ -1,5 +1,5 @@
 # app/dependencies/auth.py
-from typing import Generator, Optional, Callable
+from typing import Callable
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer

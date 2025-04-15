@@ -1,7 +1,6 @@
 # CRUD operations for authentication models (User, Role, Permission)
 
 from sqlmodel import Session, select
-from typing import Optional
 from pydantic import EmailStr
 from app.core import security # Import security for password hashing
 from datetime import datetime, timezone # Import datetime for timestamp
@@ -11,7 +10,7 @@ from datetime import datetime, timezone # Import datetime for timestamp
 from .models import User, UserCreate, UserUpdate
 
 
-def get_user_by_email(session: Session, *, email: EmailStr) -> Optional[User]:
+def get_user_by_email(session: Session, *, email: EmailStr) -> User | None:
     """Get a user by email."""
     statement = select(User).where(User.email == email)
     return session.exec(statement).first()

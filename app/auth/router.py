@@ -1,6 +1,6 @@
 # app/routers/auth.py
 from datetime import timedelta, datetime, timezone
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordRequestForm
@@ -158,7 +158,7 @@ async def read_users_me(
     return current_user
 
 # Endpoint to list users - requires user.list permission
-@router.get("/users/", response_model=List[UserPublic], dependencies=[Depends(require_permission("user.list"))], tags=["Users"])
+@router.get("/users/", response_model=list[UserPublic], dependencies=[Depends(require_permission("user.list"))], tags=["Users"])
 async def read_users(
     session: Session = Depends(get_session),
     skip: int = Query(0, ge=0),

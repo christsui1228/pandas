@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session
-from typing import List, Optional
 import uvicorn
 from datetime import datetime, date
 # 导入数据库模型和配置

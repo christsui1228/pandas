@@ -4,44 +4,46 @@ from datetime import datetime
 
 # --- Pydantic Models for Sample Orders ---
 class SampleOrderResponse(SQLModel):
-    id: Optional[int] = None
+    id: int | None = None
     order_id: str
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
+    customer_name: str | None = None
+    phone: str | None = None
+    shop: str | None = None
+    amount: float | None = None
+    order_status: str | None = None
+    sample_status: str | None = None
+    order_created_date: datetime | None = None
     created_at: datetime
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
         arbitrary_types_allowed = True
 
 class SampleOrderCreate(SQLModel):
     order_id: str
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
+    customer_name: str | None = None
+    phone: str | None = None
+    shop: str | None = None
+    amount: float | None = None
+    order_status: str | None = None
+    sample_status: str | None = None
+    order_created_date: datetime | None = None
     
     class Config:
+        from_attributes = True
         arbitrary_types_allowed = True
 
 class SampleOrderUpdate(SQLModel):
-    order_id: Optional[str] = None
-    customer_name: Optional[str] = None
-    phone: Optional[str] = None
-    shop: Optional[str] = None
-    amount: Optional[float] = None
-    order_status: Optional[str] = None
-    sample_status: Optional[str] = None
-    order_created_date: Optional[datetime] = None
+    order_id: str | None = None
+    customer_name: str | None = None
+    phone: str | None = None
+    shop: str | None = None
+    amount: float | None = None
+    order_status: str | None = None
+    sample_status: str | None = None
+    order_created_date: datetime | None = None
     
     class Config:
+        from_attributes = True
         arbitrary_types_allowed = True
