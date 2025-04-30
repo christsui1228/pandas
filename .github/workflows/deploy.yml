@@ -44,4 +44,4 @@ jobs:
           docker pull ${{ secrets.ALIYUN_ACR_LOGIN_SERVER }}/${{ secrets.ALIYUN_ACR_REPOSITORY }}:${{ github.sha }}
           docker stop backend || true
           docker rm backend || true
-          docker run -d --name backend -p 3000:3000 ${{ secrets.ALIYUN_ACR_LOGIN_SERVER }}/${{ secrets.ALIYUN_ACR_REPOSITORY }}:${{ github.sha }}
+          docker run -d --name backend -p 8000:8000 ${{ secrets.ALIYUN_ACR_LOGIN_SERVER }}/${{ secrets.ALIYUN_ACR_REPOSITORY }}:${{ github.sha }}
