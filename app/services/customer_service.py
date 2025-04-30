@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 import pandas as pd
-from sqlmodel import Session, select, text
+from sqlmodel import Session, select, text, func
 from app.core.database import get_engine
-from app.models.customers import (
+from app.customers.models import (
     SampleCustomer, BulkCustomer, 
     SampleOrderCustomer, BulkOrderCustomer, CustomerConversion
 )
-from app.models.sample_orders import SampleOrder
+from app.sample_orders.models import SampleOrder
 from app.models.bulk_orders import BulkOrder
 
 
@@ -434,51 +434,85 @@ class CustomerService:
     
     def _update_bulk_customer_stats(self, session: Session) -> None:
         """使用pandas更新批量客户统计信息"""
-        # 获取所有批量客户
-        bulk_customers_df = pd.read_sql(select(BulkCustomer), session.connection())
-        
-        if bulk_customers_df.empty:
-            return
-        
-        # 获取所有批量订单关联
-        bulk_relations_df = pd.read_sql(
-            select(
-                BulkOrderCustomer.bulk_customer_id,
-                BulkOrderCustomer.order_date,
-                BulkOrderCustomer.amount
-            ),
-            session.connection()
-        )
-        
-        if bulk_relations_df.empty:
-            return
-        
-        # 对每个客户执行统计
-        for customer_id in bulk_customers_df['id'].unique():
-            # 转换NumPy int64类型为Python原生int类型
-            customer_id_int = int(customer_id)
+        try:
+            # 获取所有批量客户
+            bulk_customers_df = pd.read_sql(select(BulkCustomer), session.connection())
             
-            # 获取该客户的所有订单关系
-            customer_orders = bulk_relations_df[bulk_relations_df['bulk_customer_id'] == customer_id]
+            if bulk_customers_df.empty:
+                return
             
-            if customer_orders.empty:
-                continue
+            # 获取所有批量订单关联
+            bulk_relations_df = pd.read_sql(
+                select(
+                    BulkOrderCustomer.bulk_customer_id,
+                    BulkOrderCustomer.order_date,
+                    BulkOrderCustomer.amount
+                ),
+                session.connection()
+            )
             
-            # 计算统计信息
-            orders_count = len(customer_orders)
-            total_amount = customer_orders['amount'].sum()
-            first_date = customer_orders['order_date'].min()
-            last_date = customer_orders['order_date'].max()
+            if bulk_relations_df.empty:
+                return
             
-            # 更新客户记录
-            customer = session.get(BulkCustomer, customer_id_int)
-            if customer:
-                customer.bulk_orders_count = orders_count
-                customer.total_bulk_amount = float(total_amount)
-                customer.first_bulk_date = first_date
-                customer.last_bulk_date = last_date
-                session.add(customer)
+            # 对每个客户执行统计
+            for customer_id in bulk_customers_df['id'].unique():
+                # 转换NumPy int64类型为Python原生int类型
+                customer_id_int = int(customer_id)
+                
+                # 获取该客户的所有订单关系
+                customer_orders = bulk_relations_df[bulk_relations_df['bulk_customer_id'] == customer_id]
+                
+                if customer_orders.empty:
+                    continue
+                
+                # 计算统计信息
+                orders_count = len(customer_orders)
+                total_amount = customer_orders['amount'].sum()
+                first_date = customer_orders['order_date'].min()
+                last_date = customer_orders['order_date'].max()
+                
+                # 更新客户记录
+                customer = session.get(BulkCustomer, customer_id_int)
+                if customer:
+                    customer.bulk_orders_count = orders_count
+                    customer.total_bulk_amount = float(total_amount)
+                    customer.first_bulk_date = first_date
+                    customer.last_bulk_date = last_date
+                    session.add(customer)
+        finally:
+            if not self.session:
+                session.close()
+
+    def get_customer_summary(self) -> dict:
+        """获取客户数据摘要统计信息"""
+        session = self._get_session()
+        try:
+            sample_count = session.query(func.count(SampleCustomer.id)).scalar()
+            bulk_count = session.query(func.count(BulkCustomer.id)).scalar()
             
+            # 计算已转化客户数 (基于CustomerConversion表)
+            converted_count = session.query(func.count(CustomerConversion.id)).scalar()
+            
+            total_customers = sample_count + bulk_count # Or adjust logic if sample can become bulk
+            conversion_rate = (converted_count / sample_count * 100) if sample_count > 0 else 0
+            
+            return {
+                "total_customers": total_customers,
+                "sample_customers": sample_count,
+                "bulk_customers": bulk_count,
+                "converted_customers": converted_count,
+                "conversion_rate": round(conversion_rate, 2)
+            }
+        except Exception as e:
+            print(f"获取客户摘要时出错: {str(e)}")
+            # Return default/empty stats on error
+            return {
+                "total_customers": 0,
+                "sample_customers": 0,
+                "bulk_customers": 0,
+                "converted_customers": 0,
+                "conversion_rate": 0.0
+            }
         finally:
             if not self.session:
                 session.close()

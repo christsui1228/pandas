@@ -16,7 +16,7 @@ sys.path.insert(0, PROJECT_ROOT)
 
 from sqlmodel import SQLModel
 from app.core.database import get_engine
-from app.models.customers import SampleCustomer, BulkCustomer, SampleOrderCustomer, BulkOrderCustomer, CustomerConversion
+from app.customers.models import SampleCustomer, BulkCustomer, SampleOrderCustomer, BulkOrderCustomer, CustomerConversion
 from app.services.customer_service import CustomerService
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, Dict, List
-from sqlmodel import Field, SQLModel, Column, JSON
+from sqlmodel import Field, SQLModel, Column, JSON, Relationship
 
 
 class SampleCustomer(SQLModel, table=True):
@@ -46,8 +46,12 @@ class SampleCustomer(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     
+    # --- 关系属性 (一对多) ---
+    # 指向 CustomerFollowUp 模型的 'customer' 属性
+    follow_ups: List["CustomerFollowUp"] = Relationship(back_populates="customer")
+    
     def __repr__(self):
-        return f"SampleCustomer(id={self.id}, name='{self.customer_name}', phone='{self.phone}')"
+        return f"SampleCustomer(id={self.id}, name='{self.customer_name}')"
 
 
 class BulkCustomer(SQLModel, table=True):
@@ -135,3 +139,33 @@ class CustomerConversion(SQLModel, table=True):
     
     # 元数据
     created_at: datetime = Field(default_factory=datetime.now)
+
+
+class CustomerFollowUp(SQLModel, table=True):
+    """客户跟进记录模型"""
+    __tablename__ = "customer_follow_ups"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    # --- 核心字段 ---
+    contact_time: datetime = Field(default_factory=datetime.now, index=True, description="本次跟进时间")
+    follow_description: str = Field(default="", description="跟进内容描述")
+    next_contact_time: Optional[datetime] = Field(default=None, description="下次计划跟进时间")
+    follow_up_type: Optional[str] = Field(default=None, description="跟进类型 (例如: 电话, 微信, 拜访)")
+    created_by: Optional[str] = Field(default=None, description="跟进人/创建人")
+    follow_file: Optional[str] = Field(default=None, description="相关文件路径或URL")
+
+    # --- 外键关联 ---
+    sample_customer_id: Optional[int] = Field(default=None, foreign_key="sample_customers.id", index=True, description="关联的样品客户ID")
+
+    # --- 关系属性 (多对一) ---
+    # 使用字符串 "SampleCustomer" 避免直接引用
+    customer: Optional["SampleCustomer"] = Relationship(back_populates="follow_ups")
+
+    # --- 元数据 ---
+    created_at: datetime = Field(default_factory=datetime.now)
+    # 使用 sa_column_kwargs 来设置数据库级别的 onupdate
+    updated_at: datetime = Field(default_factory=datetime.now, sa_column_kwargs={"onupdate": datetime.now})
+
+    def __repr__(self):
+        return f"CustomerFollowUp(id={self.id}, customer_id={self.sample_customer_id}, contact_time='{self.contact_time}')"

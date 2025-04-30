@@ -22,18 +22,23 @@ load_dotenv(os.path.join(project_root, '.env'))
 
 # --- Import ALL your SQLModel models here! ---
 # This is crucial for Alembic's autogenerate feature
-# Example: from app.models.some_model import SomeModel
-# Based on your database.py:
 try:
-    from app.models.sample_orders import SampleOrder
+    # Import from the new feature-based structure for most models
+    from app.sample_orders.models import SampleOrder
+    from app.customers.models import SampleCustomer, BulkCustomer, CustomerFollowUp
+    from app.auth.models import User, Role, Permission # Assuming RolePermission is a link table
+
+    # Import from the central app/models/ directory for specific models
     from app.models.bulk_orders import BulkOrder
-    # If you have a base Order model, import it too
-    # from app.models import Order # Uncomment if exists
-    from app.models.auth import User, Role, Permission, RolePermission
+    from app.models.orders import Order
+
+    # Add imports for any other SQLModel tables you have defined
+
     print("Successfully imported models for Alembic.")
 except ImportError as e:
     print(f"Error importing models for Alembic: {e}")
     print("Please ensure all SQLModel models are correctly placed and importable.")
+    # print("Verify paths like 'app.bulk_orders.models', 'app.original_orders.models', etc.")
     # Depending on your setup, you might need to adjust paths or ensure __init__.py files exist
 
 # --- Alembic Config object ---

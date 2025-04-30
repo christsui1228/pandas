@@ -1,5 +1,5 @@
-from sqlmodel import SQLModel
-from datetime import datetime
+from sqlmodel import SQLModel, Field
+from datetime import datetime, date
 from typing import List, Optional
 
 # --- Sample Customer Schemas ---
@@ -46,7 +46,45 @@ class SampleCustomerUpdate(SampleCustomerBase):
     conversion_date: datetime | None = None
     bulk_customer_id: int | None = None
 
-class SampleCustomerRead(SampleCustomerBase):
+# Remove or rename the old SampleCustomerRead
+# class SampleCustomerRead(SampleCustomerBase):
+#    id: int
+#    ...
+#    class Config:
+#        from_attributes = True
+
+# --- Customer FollowUp Schemas ---
+
+class CustomerFollowUpBase(SQLModel):
+    contact_time: datetime | None = None
+    follow_up_type: str | None = None
+    follow_description: str
+    next_contact_time: datetime | None = None
+    created_by: str | None = None
+    sample_customer_id: int
+
+class CustomerFollowUpCreate(CustomerFollowUpBase):
+    pass
+
+class CustomerFollowUpUpdate(SQLModel):
+    contact_time: datetime | None = None
+    follow_up_type: str | None = None
+    follow_description: str | None = None
+    next_contact_time: datetime | None = None
+    created_by: str | None = None
+
+class CustomerFollowUpRead(CustomerFollowUpBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# --- Updated Sample Customer Read Schema ---
+# Replace the original SampleCustomerRead with this one that includes follow-ups
+class SampleCustomerReadWithFollowUps(SampleCustomerBase):
     id: int
     # Include calculated/derived fields from the model
     first_sample_date: datetime | None = None
@@ -58,9 +96,15 @@ class SampleCustomerRead(SampleCustomerBase):
     bulk_customer_id: int | None = None
     created_at: datetime
     updated_at: datetime
+    follow_ups: List[CustomerFollowUpRead] = [] # Add the list of follow-ups
 
     class Config:
         from_attributes = True
+
+# --- Add Response Model for Paginated List ---
+class SampleCustomerListResponse(SQLModel):
+    items: List[SampleCustomerReadWithFollowUps] # Use the detailed schema for now
+    total: int
 
 # --- Bulk Customer Schemas ---
 

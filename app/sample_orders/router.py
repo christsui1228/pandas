@@ -1,23 +1,34 @@
 from fastapi import APIRouter, HTTPException, Depends
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from datetime import datetime
 
 from .models import SampleOrder
 from .schemas import SampleOrderResponse, SampleOrderCreate, SampleOrderUpdate
 from app.core.database import get_session
 
+from pydantic import BaseModel
+
+class SampleOrderListResponse(BaseModel):
+    items: list[SampleOrderResponse]
+    total: int
+
 router = APIRouter()
 
 # --- Sample Order API Routes (moved from main.py) ---
-@router.get("/", response_model=list[SampleOrderResponse])
+@router.get("/", response_model=SampleOrderListResponse)
 async def get_sample_orders(
     skip: int = 0, 
-    limit: int = 100,
+    limit: int = 10,
     db: Session = Depends(get_session)
 ):
-    """获取样品订单列表"""
-    orders = db.exec(select(SampleOrder).offset(skip).limit(limit)).all()
-    return orders
+    """获取样品订单列表 (分页)"""
+    orders_query = select(SampleOrder).offset(skip).limit(limit)
+    orders = db.exec(orders_query).all()
+
+    count_query = select(func.count(SampleOrder.id))
+    total_count = db.exec(count_query).one()
+
+    return SampleOrderListResponse(items=orders, total=total_count)
 
 @router.get("/{order_id}", response_model=SampleOrderResponse)
 async def get_sample_order(order_id: str, db: Session = Depends(get_session)):
