@@ -1,0 +1,51 @@
+# Git specific
+.git
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PDM / Virtual environment specific
+.venv/
+.pdm-python
+.pdm.toml
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Local environment configuration (NEVER commit .env to git or include in Docker image)
+.env
+.env.*
+! .env.example # If you have an example env file, you might want to keep it
+
+# Test artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+nosetests.xml
+
+# Build artifacts / Distribution
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints 
