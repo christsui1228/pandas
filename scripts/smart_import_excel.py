@@ -14,7 +14,7 @@
 import sys
 import os
 import argparse
-from dotenv import load_dotenv
+import logging
 
 # 添加项目根目录到Python路径
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -23,15 +23,17 @@ sys.path.insert(0, PROJECT_ROOT)
 from app.services.import_service import ImportService
 
 if __name__ == "__main__":
+    # Configure basic logging
+    logging.basicConfig(level=logging.INFO, 
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+
     # 解析命令行参数
     parser = argparse.ArgumentParser(description='Excel数据智能导入PostgreSQL工具')
     parser.add_argument('--dir', type=str, help='Excel文件所在目录')
     parser.add_argument('--file', type=str, help='单个Excel文件路径')
-    parser.add_argument('--batch-size', type=int, default=1000, help='每批处理的记录数量，默认500')
+    parser.add_argument('--batch-size', type=int, default=1000, help='每批处理的记录数量，默认1000')
     args = parser.parse_args()
-    
-    # 加载环境变量
-    load_dotenv()
     
     service = ImportService()
     
@@ -53,7 +55,7 @@ if __name__ == "__main__":
         
         for file_path in excel_files:
             try:
-                service.upsert_excel_to_db(file_path)
+                service.upsert_excel_to_db(file_path, batch_size=args.batch_size)
             except Exception as e:
                 print(f"处理文件 {file_path} 时出错: {str(e)}")
     

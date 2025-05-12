@@ -1,5 +1,5 @@
 # app/models/orders.py
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import SQLModel, Field
 
 class Order(SQLModel, table=True):
@@ -45,5 +45,5 @@ class Order(SQLModel, table=True):
     notes: str | None = Field(default=None)  # 备注
     
     # 元数据
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

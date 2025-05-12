@@ -20,7 +20,6 @@ import os
 import sys
 import argparse
 from sqlalchemy import text
-from dotenv import load_dotenv
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -53,9 +52,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='设置原始订单表')
     parser.add_argument('--no-drop', action='store_true', help='不删除现有表，仅创建不存在的表')
     args = parser.parse_args()
-    
-    # 加载环境变量
-    load_dotenv()
     
     print("准备设置原始订单表...")
     

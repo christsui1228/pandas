@@ -1,19 +1,21 @@
 # app/core/security.py
-import os
+# import os # No longer needed for getenv
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Union
 
 from jose import jwt, JWTError
 from passlib.context import CryptContext
-from dotenv import load_dotenv
+# from dotenv import load_dotenv # No longer needed
 
-# 加载环境变量 (如果需要单独加载)
-load_dotenv()
+from .config import settings # Import the centralized settings
+
+# load_dotenv() # Remove this line
 
 # --- 配置 ---
-SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key-only-for-dev") # 强烈建议在.env设置
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+# Values are now sourced from the settings object
+# SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key-only-for-dev")
+# ALGORITHM = os.getenv("ALGORITHM", "HS256")
+# ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 # --- 密码处理 ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -41,10 +43,10 @@ def create_access_token(
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES # Use settings
         )
     to_encode: Dict[str, Any] = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM) # Use settings
     return encoded_jwt
 
 def decode_access_token(token: str) -> Optional[str]:
@@ -55,7 +57,7 @@ def decode_access_token(token: str) -> Optional[str]:
     :return: 主题 (subject) 如果令牌有效且未过期，否则返回 None
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]) # Use settings
         subject: str = payload.get("sub")
         if subject is None:
             return None # 或者抛出异常

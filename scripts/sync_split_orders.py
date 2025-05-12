@@ -15,7 +15,6 @@ import sys
 import os
 import argparse
 from datetime import datetime
-from dotenv import load_dotenv
 import pandas as pd
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel, Session, select, create_engine
@@ -140,9 +139,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='同步原始订单到样品订单和批量订单表')
     parser.add_argument('--dry-run', action='store_true', help='模拟运行，不实际写入数据库')
     args = parser.parse_args()
-    
-    # 加载环境变量
-    load_dotenv()
     
     print("开始执行订单同步脚本...")
     

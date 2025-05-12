@@ -15,10 +15,9 @@ sys.path.insert(0, project_root)
 
 # --- Import SQLModel and your models ---
 from sqlmodel import SQLModel
-from dotenv import load_dotenv
 
-# --- Load environment variables for database URL ---
-load_dotenv(os.path.join(project_root, '.env'))
+# --- Import centralized settings ---
+from app.core.config import settings # Import the centralized settings
 
 # --- Import ALL your SQLModel models here! ---
 # This is crucial for Alembic's autogenerate feature
@@ -53,22 +52,22 @@ if config.config_file_name is not None:
 # For 'autogenerate' support, assign your SQLModel.metadata here
 target_metadata = SQLModel.metadata
 
-# --- Function to get Database URL from environment variables ---
-def get_database_url():
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-    db_host = os.getenv("DB_HOST")
-    db_port = os.getenv("DB_PORT")
-    db_name = os.getenv("DB_NAME")
-    if not all([db_user, db_password, db_host, db_port, db_name]):
-        raise ValueError("Database connection details missing in environment variables.")
-    # Use the same URL format as in your application
-    return f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?sslmode=disable"
+# --- Function to get Database URL from centralized settings ---
+def get_database_url_from_settings():
+    # Construct the database URL from the settings object
+    # Ensure your Settings model has these attributes:
+    # DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
+    url = f"postgresql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
+    # Add sslmode=disable if it's consistently used, or make it configurable in settings
+    # For example, if settings has DB_SSL_MODE:
+    # url = f"{url}?sslmode={settings.DB_SSL_MODE}"
+    # For now, assuming sslmode=disable is always desired for migrations based on original code
+    return f"{url}?sslmode=disable"
 
 # --- Configure Alembic context ---
 # Inject the database URL into the config object
 # This avoids hardcoding it in alembic.ini
-config.set_main_option('sqlalchemy.url', get_database_url())
+config.set_main_option('sqlalchemy.url', get_database_url_from_settings())
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

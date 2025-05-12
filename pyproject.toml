@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "", email = ""},
 ]
-dependencies = ["pandas>=2.2.3", "sqlalchemy>=2.0.38", "psycopg2-binary>=2.9.10", "python-dotenv>=1.0.1", "matplotlib>=3.10.1", "sqlmodel>=0.0.24", "openpyxl>=3.1.5", "fastapi>=0.115.12", "uvicorn>=0.34.0", "python-multipart>=0.0.20", "python-jose[cryptography]>=3.4.0", "passlib[bcrypt]>=1.7.4", "alembic>=1.15.2", "pydantic[email]>=2.11.3", "bcrypt==3.2.0", "polars>=1.27.1", "connectorx>=0.4.3", "pyarrow>=19.0.1"]
+dependencies = ["pandas>=2.2.3", "sqlalchemy>=2.0.38", "psycopg2-binary>=2.9.10", "python-dotenv>=1.0.1", "matplotlib>=3.10.1", "sqlmodel>=0.0.24", "openpyxl>=3.1.5", "fastapi>=0.115.12", "uvicorn>=0.34.0", "python-multipart>=0.0.20", "python-jose[cryptography]>=3.4.0", "passlib[bcrypt]>=1.7.4", "alembic>=1.15.2", "pydantic[email]>=2.11.3", "bcrypt==3.2.0", "polars>=1.27.1", "connectorx>=0.4.3", "pyarrow>=19.0.1", "pydantic-settings>=2.9.1"]
 requires-python = "==3.12.*"
 readme = "README.md"
 license = {text = "MIT"}
@@ -13,3 +13,9 @@ license = {text = "MIT"}
 
 [tool.pdm]
 distribution = false
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+]

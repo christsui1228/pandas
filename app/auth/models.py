@@ -1,6 +1,6 @@
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 # --- Link Tables ---
@@ -52,8 +52,8 @@ class User(SQLModel, table=True):
     hashed_password: str = Field()
     is_active: bool = Field(default=True)
     is_superuser: bool = Field(default=False)
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now, sa_column_kwargs={"onupdate": datetime.now})
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     role_id: int | None = Field(default=None, foreign_key="roles.id")
     created_by_id: int | None = Field(default=None, foreign_key="users.id")
 
@@ -93,8 +93,9 @@ class UserPublic(SQLModel):
     email: str = Field(index=True, unique=True, max_length=100)
     is_active: bool = Field(default=True)
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 # Model for updating a user (API input)
 class UserPasswordUpdate(SQLModel):

@@ -1,21 +1,17 @@
-import os
+# import os # No longer needed for getenv
 from sqlalchemy import inspect
 from sqlmodel import SQLModel, create_engine, Session
-from dotenv import load_dotenv
+# from dotenv import load_dotenv # No longer needed, Pydantic Settings handles .env
 
-# 加载.env文件中的环境变量
-load_dotenv()
+from .config import settings # Import the centralized settings
+
+# load_dotenv() # Remove this line
 
 def get_engine():
     """获取数据库引擎连接"""
-    db_user = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-    db_host = os.getenv("DB_HOST")
-    db_port = os.getenv("DB_PORT")
-    db_name = os.getenv("DB_NAME")
-
-    # 添加连接参数解决SSL问题
-    database_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}?sslmode=disable"
+    # Use values from the settings object
+    # Type conversion (e.g., for DB_PORT) is handled by Pydantic
+    database_url = f"postgresql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}?sslmode=disable"
     
     # 优化连接池参数配置，基于阿里云RDS实例规格(400最大连接)
     return create_engine(
